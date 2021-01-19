@@ -1,0 +1,1652 @@
+openapi: 3.0.0
+servers:
+  - url: https://x-api.photonpay.com
+    description: 光子易生产服务器
+  - url: https://test-api.guangziyi.com
+    description: 光子易测试服务器
+info:
+  description: |
+    This is a sample server Petstore server.
+    You can find out more about Swagger at
+    [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).
+    For this sample, you can use the api key `special-key` to test the authorization filters.
+
+    # Introduction
+    This API is documented in **OpenAPI format** and is based on
+    [Petstore sample](http://petstore.swagger.io/) provided by [swagger.io](http://swagger.io) team.
+    It was **extended** to illustrate features of [generator-openapi-repo](https://github.com/Rebilly/generator-openapi-repo)
+    tool and [ReDoc](https://github.com/Redocly/redoc) documentation. In addition to standard
+    OpenAPI syntax we use a few [vendor extensions](https://github.com/Redocly/redoc/blob/master/docs/redoc-vendor-extensions.md).
+
+    # OpenAPI Specification
+    This API is documented in **OpenAPI format** and is based on
+    [Petstore sample](http://petstore.swagger.io/) provided by [swagger.io](http://swagger.io) team.
+    It was **extended** to illustrate features of [generator-openapi-repo](https://github.com/Rebilly/generator-openapi-repo)
+    tool and [ReDoc](https://github.com/Redocly/redoc) documentation. In addition to standard
+    OpenAPI syntax we use a few [vendor extensions](https://github.com/Redocly/redoc/blob/master/docs/redoc-vendor-extensions.md).
+
+    # Cross-Origin Resource Sharing
+    This API features Cross-Origin Resource Sharing (CORS) implemented in compliance with  [W3C spec](https://www.w3.org/TR/cors/).
+    And that allows cross-domain communication from the browser.
+    All responses have a wildcard same-origin which makes them completely public and accessible to everyone, including any code on any site.
+
+    # Authentication
+
+    Petstore offers two forms of authentication:
+      - API Key
+      - OAuth2
+    OAuth2 - an open protocol to allow secure authorization in a simple
+    and standard method from web, mobile and desktop applications.
+
+    <SecurityDefinitions />
+
+  version: 1.0.0
+  title: 光子易open api接口文档
+  contact:
+    name: API Support
+    email: api-support@photonpay.com
+    url: https://www.photonpay.com
+  x-logo:
+    url: 'https://redocly.github.io/redoc/petstore-logo.png'
+    altText: Petstore logo
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+externalDocs:
+  description: Find out how to create Github repo for your OpenAPI spec.
+  url: 'https://github.com/Rebilly/generator-openapi-repo'
+tags:
+  - name: authorization
+    description: 光子易接口授权认证接口, 发送报文必须先授权认证后得到TOKEN
+  - name: sign
+    description: 所有发送给光子易后端接口都必须加签
+  - name: store
+    description: 光子易和店匠绑定店铺的接口文档
+  - name: payment
+    description: 光子易跨境支付关于国际信用卡, 全球本地化接口文档
+  - name: webhook_notify
+    description: 光子易后台关于支付接口的后台通知接口
+  - name: payment_error_codes
+    x-displayName: 支付错误码合集
+    description: |
+  - name: store_error_codes
+    x-displayName: 绑定店铺错误嘛合集
+    description: |
+x-tagGroups:
+  - name: 接口APi
+    tags:
+      - authorization
+      - sign
+      - store
+      - payment
+  - name: notify
+    tags:
+      - webhook_notify
+  - name: error_code
+    tags:
+      - payment_error_codes
+      - store_error_codes
+paths:
+  '/oauth2/token/accessToken':
+    post:
+      tags:
+      - authorization
+      summary: 获取token接口
+      operationId: shoplazzaQueryUsingPOST
+      parameters:
+      - name: Authorization
+        in: header
+        description: basic Base64({appId}/{appSecret}) 请联系光子开发支持获取appId和appSecret
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/appLoginResp'
+        '404':
+          description: 找不到资源
+  '/member/shoplazza/store/binding':
+    post:
+      tags:
+      - store
+      summary: 店匠店铺绑定接口
+      parameters:
+      - name: X-PD-SIGN
+        in: header
+        description: 加签字段
+        required: true
+        schema:
+          type: string
+      - name: X-PD-TOKEN
+        in: header
+        description: 访问令牌
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              '$ref': '#/components/schemas/storeBind'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/storeBindResp'
+        '404':
+          description: 找不到资源
+  '/member/shoplazza/store/unbinding/{storeId}':
+    post:
+      tags:
+      - store
+      summary: 店匠店铺解绑接口
+      parameters:
+      - name: X-PD-SIGN
+        in: header
+        description: 加签字段
+        required: true
+        schema:
+          type: string
+      - name: X-PD-TOKEN
+        in: header
+        description: 访问令牌
+        required: true
+        schema:
+          type: string
+      - name: storeId
+        in: path
+        description: 店匠的店铺ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/storeUnBindResp'
+        '404':
+          description: 找不到资源
+  '/member/shoplazza/store/query/{storeId}':
+    post:
+      tags:
+      - store
+      summary: 店匠店铺绑定接口
+      parameters:
+      - name: X-PD-SIGN
+        in: header
+        description: 加签字段
+        required: true
+        schema:
+          type: string
+      - name: X-PD-TOKEN
+        in: header
+        description: 访问令牌
+        required: true
+        schema:
+          type: string
+      - name: storeId
+        in: path
+        description: 店匠的店铺ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/storeBindResp'
+        '404':
+          description: 找不到资源          
+  '/payment/txncore/shoplazza/auth':
+    post:
+      tags:
+      - payment
+      summary: 店匠预授权接口
+      operationId: shoplazzaAuthUsingPOST
+      parameters:
+      - name: X-PD-SIGN
+        in: header
+        description: 加签字段
+        required: true
+        schema:
+          type: string
+      - name: X-PD-TOKEN
+        in: header
+        description: 访问令牌
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              '$ref': '#/components/schemas/saSubmitCheckout'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/firstResp'
+        '404':
+          description: 找不到资源
+  '/payment/txncore/shoplazza/capture':
+    post:
+      tags:
+      - payment
+      summary: 店匠预授权完成接口
+      operationId: shoplazzaCaptureUsingPOST
+      parameters:
+      - name: X-PD-SIGN
+        in: header
+        description: 加签字段
+        required: true
+        schema:
+          type: string
+      - name: X-PD-TOKEN
+        in: header
+        description: 访问令牌
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              '$ref': '#/components/schemas/secondReq'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/saSecondResp'
+            '*/*':
+              schema:
+                '$ref': '#/components/schemas/saSecondResp'
+        '404':
+          description: 找不到资源
+  '/payment/txncore/shoplazza/void':
+    post:
+      tags:
+      - payment
+      summary: 店匠预授权权撤销
+      operationId: shoplazzaVoidUsingPOST
+      parameters:
+      - name: X-PD-SIGN
+        in: header
+        description: 加签字段
+        required: true
+        schema:
+          type: string
+      - name: X-PD-TOKEN
+        in: header
+        description: 访问令牌
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/voidReq"
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/saVoidResp"
+            "*/*":
+              schema:
+                $ref: "#/components/schemas/saVoidResp"
+        '404':
+          description: 找不到资源
+  '/payment/txncore/shoplazza/sale':
+    post:
+      tags:
+      - payment
+      summary: 店匠支付接口
+      operationId: shoplazzaSaleUsingPOST
+      parameters:
+      - name: X-PD-SIGN
+        in: header
+        description: 加签字段
+        required: true
+        schema:
+          type: string
+      - name: X-PD-TOKEN
+        in: header
+        description: 访问令牌
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              '$ref': '#/components/schemas/saSubmitCheckout'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/firstResp'
+            '*/*':
+              schema:
+                '$ref': '#/components/schemas/firstResp'
+        '404':
+          description: 找不到资源
+  '/payment/txncore/shoplazza/refund':
+    post:
+      tags:
+      - payment
+      summary: 店匠退款接口
+      operationId: shoplazzaRefundUsingPOST
+      parameters:
+      - name: X-PD-SIGN
+        in: header
+        description: 加签字段
+        required: true
+        schema:
+          type: string
+      - name: X-PD-TOKEN
+        in: header
+        description: 访问令牌
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              '$ref': '#/components/schemas/secondReq'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/saSecondResp'
+        '404':
+          description: 找不到资源
+  '/payment/txncore/shoplazza/review':
+    post:
+      tags:
+      - payment
+      summary: 店匠审核接口
+      operationId: shoplazzaReviewUsingPOST
+      parameters:
+      - name: X-PD-SIGN
+        in: header
+        description: 加签字段
+        required: true
+        schema:
+          type: string
+      - name: X-PD-TOKEN
+        in: header
+        description: 访问令牌
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              '$ref': '#/components/schemas/reviewReq'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/safirstResp'
+        '404':
+          description: 找不到资源
+  '/payment/txncore/shoplazza/query':
+    get:
+      tags:
+      - payment
+      summary: 店匠查询接口
+      parameters:
+      - name: X-PD-SIGN
+        in: header
+        description: 加签字段
+        required: true
+        schema:
+          type: string
+      - name: X-PD-TOKEN
+        in: header
+        description: 访问令牌
+        required: true
+        schema:
+          type: string
+      - name: reqId
+        in: query
+        description: 访问令牌
+        required: true
+        schema:
+          type: string
+      - name: transactionType
+        in: query
+        description: 访问令牌
+        required: true
+        schema:
+          type: string
+          
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/safirstResp'
+        '404':
+          description: 找不到资源         
+components:
+  schemas:
+    address:
+      title: address
+      required:
+      - address1
+      - city
+      - country
+      type: object
+      properties:
+        address1:
+          type: string
+          description: 详细地址1
+        address2:
+          type: string
+          description: 详细地址2
+        city:
+          type: string
+          description: 城市
+        company:
+          type: string
+          description: 公司名称
+        country:
+          type: string
+          description: 国家地址
+          example: CN
+        firstName:
+          type: string
+          description: 名
+          example: JOHN
+        lastModifierPhoneTime:
+          type: string
+          description: 最后一次修改电话时间
+          example: '20211212234055'
+        lastModifierStreetTime:
+          type: string
+          description: 最后一次修改街道名称时间
+          example: '20211212234055'
+        lastName:
+          type: string
+          description: 姓
+          example: DUKE
+        phone:
+          type: string
+          description: 电话
+          example: '13213213213'
+        phonePrefix:
+          type: string
+          description: 电话前缀
+          example: '86'
+        state:
+          type: string
+          description: 省份
+        zip:
+          type: string
+          description: 邮编号
+      description: 地址信息, 比如说支付时候的账单地址,邮寄地址等信息
+    card:
+      title: card
+      required:
+      - cardNo
+      - cvv
+      - expireMonth
+      - expireYear
+      - firstName
+      - lastName
+      type: object
+      properties:
+        cardNo:
+          type: string
+          description: 卡号
+          example: '4600001212344135'
+        cvv:
+          type: string
+          description: cvv
+          example: '123'
+        expireMonth:
+          type: string
+          description: 过期月
+          example: '12'
+          enum:
+          - '01'
+          - '02'
+          - '03'
+          - '04'
+          - '05'
+          - '06'
+          - '07'
+          - '08'
+          - '09'
+          - '10'
+          - '11'
+          - '12'
+        expireYear:
+          type: string
+          description: 过期年
+          example: '2021'
+        firstName:
+          type: string
+          description: 名
+        lastName:
+          type: string
+          description: 姓
+      description: 信用卡支付, 填写的卡信息
+    creditCardSaS2sCheckout:
+      description: 信用卡支付传参数 
+      allOf:
+        - $ref: '#/components/schemas/saSubmitCheckout'
+        - type: object
+          required:
+            - payInfo
+            - billing
+          properties:
+              payInfo:
+                $ref: '#/components/schemas/card'
+              secure3d:
+                type: string
+                enum:
+                - N
+                - Y
+              billing:
+                description: 账单地址
+                $ref: '#/components/schemas/address'
+              browser:
+                description: 浏览器信息3D必填
+                $ref: '#/components/schemas/browser'
+    firstResp:
+      title: firstResp
+      type: object
+      properties:
+        code:
+          type: string
+          description: 系统的交易结果码
+        continueUrl:
+          type: string
+          description: 接着交易的URL(3D,本地化跳转URL)
+        maskCardNo:
+          type: string
+          description: 信用卡支付返回的卡号
+          example: 450000**********1234
+        msg:
+          type: string
+          description: 系统的交易结果描述
+        remark:
+          type: string
+          description: 请求的remark参数，原文返回
+        reqId:
+          type: string
+          description: 请求订单号
+        secured3d:
+          type: string
+          description: 是否3D支付
+          enum:
+          - N
+          - Y
+        status:
+          type: string
+          description: 订单的状态
+          enum:
+          - cancelled
+          - expired
+          - failed
+          - pending
+          - succeed
+          - suspend
+        tradeNo:
+          type: string
+          description: 交易订单号
+      description: 正向订单返回参数
+    goods:
+      title: goods
+      required:
+      - name
+      type: object
+      properties:
+        desc:
+          type: string
+          description: 商品描述
+        gift:
+          type: string
+          description: 是否是礼物
+          enum:
+          - N
+          - Y
+        goodsLocation:
+          type: string
+          description: 商品介绍页
+        name:
+          type: string
+          description: 商品名称
+          example: 华为 MATE 30
+        price:
+          type: string
+          description: 商品价格
+          example: '3.24'
+        quantity:
+          type: string
+          description: 商品数量
+          example: '1'
+        sku:
+          type: string
+          description: sku单号
+        virtual:
+          type: string
+          description: 是否虚拟产品
+          example: Y
+          enum:
+          - N
+          - Y
+      description: 商品信息
+    qiwiPayInfo:
+      title: qiwiPayInfo
+      required:
+      - email
+      type: object
+      properties:
+        email:
+          type: string
+          description: qiwi账户邮箱
+      description: qiwi支付信息
+    qiwiSaS2sCheckout:
+      description: qiwi checkout
+      allOf:
+        - $ref: '#/components/schemas/saSubmitCheckout'
+        - type: object
+          properties:
+            payInfo:
+              description: qiwi支付信息
+              '$ref': '#/components/schemas/qiwiPayInfo'
+              type: string
+    reviewReq:
+      title: reviewReq
+      required:
+      - reqId
+      - tradeNo
+      type: object
+      properties:
+        reqId:
+          type: string
+          description: 请求订单号
+        reviewType:
+          type: string
+          description: review类型
+          enum:
+          - approve
+          - reject
+        tradeNo:
+          type: string
+          description: 交易订单号
+      description: review请求对象
+    risk:
+      title: risk
+      required:
+      - fingerprintId
+      - riskShopper
+      type: object
+      properties:
+        airLine:
+          description: 航空类型风控必填信息
+          $ref: '#/components/schemas/riskAirLine'
+        fingerprintId:
+          type: string
+          description: 设备指纹ID
+        recharge:
+          description: 游戏充值类风控信息
+          $ref: '#/components/schemas/riskRecharge'
+        rentalCar:
+          description: 租车类风控信息
+          $ref: '#/components/schemas/riskRentalCar'
+        retryTimes:
+          type: string
+          description: 重试支付次数
+        riskShopper:
+          description: 购物者风控信息
+          $ref: '#/components/schemas/riskShopper'
+      description: 风控信息
+    riskAirLine:
+      title: riskAirLine
+      type: object
+      properties:
+        adultsNumber:
+          type: string
+          description: 成人人数
+        airLinePnr:
+          type: string
+          description: 航空公司PNR
+        aircraftCabinType:
+          type: string
+        airlineCompanyID:
+          type: string
+          description: 航空公司标示码
+        arrivalCity:
+          type: string
+          description: 到达的城市
+        arrivalCountry:
+          type: string
+          description: 到达的国家
+          example: CN
+        arrivalTime:
+          type: string
+          description: 航班到达时间  yyyyMMdd
+          example: '20201221'
+        arrivalTimezone:
+          type: string
+          description: 航班到达对应的时区
+          example: UTC+8
+        bestFare:
+          type: string
+          description: 是否当前最优票价(Y/N)
+          enum:
+          - N
+          - Y
+        birthday:
+          type: string
+          description: 生日 yyyyMMdd
+          example: '20201221'
+        bookChannel:
+          type: string
+          description: 订票渠道 Web/call center/mobile app/ota
+          enum:
+          - Web
+          - call center
+          - mobile app
+          - ota
+        bookNumber:
+          type: string
+          description: 预定房间数
+          example: '1'
+        changedTakeoffTime:
+          type: string
+          description: 航班改签的起飞时间  yyyyMMdd
+          example: '20201221'
+        checkInDate:
+          type: string
+          description: 入住日期  yyyyMMdd
+          example: '20201221'
+        childrenNumber:
+          type: string
+          description: 儿童人数
+        connectingCity:
+          type: string
+          description: 中转的城市
+        connectingTicket:
+          type: string
+          description: 是否是联程票(Y/N)
+          enum:
+          - N
+          - Y
+        contactEmail:
+          type: string
+          description: 联系邮箱
+        contactName:
+          type: string
+          description: 联系姓名
+        contactPhone:
+          type: string
+          description: 联系电话
+        contactPhonePrefix:
+          type: string
+          description: 联系电话前缀
+        country:
+          type: string
+          description: 乘机人国家
+          example: CN
+        flightNumber:
+          type: string
+          description: 航班标示码
+        freeChange:
+          type: string
+          description: 是否可以免费改签(Y/N)
+          enum:
+          - N
+          - Y
+        frequentFlyerNumber:
+          type: string
+          description: 常旅号
+        haveChanged:
+          type: string
+          description: 是否已改签(Y/N)
+          enum:
+          - N
+          - Y
+        hotelCountry:
+          type: string
+          description: 酒店所在国家
+          example: CN
+        hotelCustomerName:
+          type: string
+          description: 住宿客户名称
+        hotelName:
+          type: string
+          description: 酒店名称
+        hotelStar:
+          type: string
+          description: 酒店等级
+          example: '5'
+        idNo:
+          type: string
+          description: 证件号
+        idType:
+          type: string
+          description: 证件类型
+          enum:
+          - driving license
+          - id
+          - passport
+          - visa
+        ifConnectingFlight:
+          type: string
+          description: 是否中转(Y/N)
+          enum:
+          - N
+          - Y
+        insurance:
+          type: string
+          description: 是否购买保险(Y/N)
+          enum:
+          - N
+          - Y
+        offDurationHour:
+          type: integer
+          description: 离起飞还剩下的小时数
+          format: int32
+        passengerFirstName:
+          type: string
+          description: 乘客名
+        passengerLastName:
+          type: string
+          description: 乘客姓
+        phone:
+          type: string
+          description: 乘机人手机
+        phonePrefix:
+          type: string
+          description: 乘机人手机前缀
+        productType:
+          type: string
+          description: 订票类型 Ticket/Hotel/Ticket&Hotel/Others
+          enum:
+          - Hotel
+          - Others
+          - Ticket
+          - Ticket&Hotel
+        refundPolicy:
+          type: string
+          description: 是否可退 01/02/03  免费取消/部分取消/不退款
+          enum:
+          - '01'
+          - '02'
+          - '03'
+        routeType:
+          type: string
+          description: 舱位类型 First Class/Business Class/Premium Economy/Economy
+          enum:
+          - Business Class
+          - Economy
+          - First Class
+          - Premium Economy
+        takeOffCity:
+          type: string
+          description: 起飞城市
+        takeOffCountry:
+          type: string
+          description: 起飞国家
+          example: CN
+        takeOffTime:
+          type: string
+          description: 航班起飞时间  yyyyMMdd
+          example: '20201221'
+        takeOffTimeZone:
+          type: string
+          description: 航班起飞对应的时区
+          example: UTC+8
+        thirdPartyBook:
+          type: string
+          description: 持卡人是否在乘机人之中(Y/N)
+          enum:
+          - N
+          - Y
+        tripType:
+          type: string
+          description: 行程类型 01/02  单程/往返
+          enum:
+          - '01'
+          - '02'
+        valueAdded:
+          type: string
+          description: 是否航司增值(Y/N)
+          enum:
+          - N
+          - Y
+      description: 游戏充值类风控信息
+    riskRecharge:
+      title: riskRecharge
+      type: object
+      properties:
+        accountName:
+          type: string
+          description: 充值账户名称
+        gameCategory:
+          type: string
+          description: 游戏充值的类型  Point Card/Prop/Other
+          enum:
+          - Other
+          - Point Card
+          - Prop
+        gameName:
+          type: string
+        gameTerminal:
+          type: string
+          description: 游戏终端  PC/Mobile
+          enum:
+          - Mobile
+          - PC
+        memberNo:
+          type: string
+          description: 充值账户id
+        platformCategory:
+          type: string
+          description: 平台充值类型(Direct/Card/Gift Card)
+          enum:
+          - Card
+          - Direct
+          - Gift Card
+        serverCountry:
+          type: string
+          description: 游戏国家
+          example: CN
+        type:
+          type: string
+          description: 充值类型(Game/Platform)
+          enum:
+          - Game
+          - Platform
+      description: 航空类型风控必填信息
+    riskRentalCar:
+      title: riskRentalCar
+      type: object
+      properties:
+        childrenNumber:
+          type: string
+          description: 儿童人数
+        country:
+          type: string
+          description: 租车人国家
+          example: CN
+        discountAmount:
+          type: string
+          description: 折扣金额
+        discountType:
+          type: string
+          description: 打折类型
+        email:
+          type: string
+          description: 租车人邮件
+        firstName:
+          type: string
+          description: 租车人名
+        idNo:
+          type: string
+          description: 证件号
+        idType:
+          type: string
+          description: 租车人证件类型
+          enum:
+          - driving license
+          - id
+          - passport
+          - visa
+        insurance:
+          type: string
+          description: 是否购买保险(Y/N)
+          enum:
+          - N
+          - Y
+        insuranceType:
+          type: string
+          description: 保险类型
+        lastName:
+          type: string
+          description: 租车人姓
+        model:
+          type: string
+          description: 租车的类型
+          enum:
+          - convertible
+          - large
+          - medium
+          - premium
+          - small
+          - suv
+          - truck
+          - van
+        personNumber:
+          type: string
+          description: 出行人数
+        phone:
+          type: string
+          description: 租车人电话
+        phonePrefix:
+          type: string
+          description: 租车人电话前缀
+        rentCity:
+          type: string
+          description: 起租城市
+        rentCountry:
+          type: string
+          description: 起租国家
+          example: CN
+        rentTime:
+          type: string
+          description: 起租时间 yyyyMMddHHmmss UTC+0
+          example: '20201221120000'
+        rentalCompany:
+          type: string
+          description: 租车公司
+        returnCity:
+          type: string
+          description: 还车城市
+        returnCountry:
+          type: string
+          description: 还车国家
+          example: CN
+      description: 租车类风控信息
+    riskShopper:
+      title: riskShopper
+      type: object
+      properties:
+        acquisitionChannel:
+          type: string
+          description: 获客方式
+          enum:
+          - AD banner
+          - Bookmark
+          - Direct
+          - Search engine
+        birthday:
+          type: string
+          description: 生日 yyyyMMdd
+          example: '20201221'
+        country:
+          type: string
+          description: 用户国家
+          example: CN
+        customerStatus:
+          type: string
+          description: 用户状态
+          enum:
+          - Existing
+          - New
+        durationYear:
+          type: string
+          description: 会员会龄
+          example: '0.5'
+        firstOrder:
+          type: string
+          description: 是否第一笔订单
+          enum:
+          - N
+          - Y
+        idNo:
+          type: string
+          description: 证件号
+        idType:
+          type: string
+        lastLoginTime:
+          type: string
+          description: 上次登陆时间 yyyyMMddHHmmss UTC+0
+          example: '20201221120000'
+        lastPayTime:
+          type: string
+          description: 上次支付时间 yyyyMMddHHmmss UTC+0
+          example: '20201221120000'
+        loginIp:
+          type: string
+          description: 登陆ip
+        nonMemberOrder:
+          type: string
+          description: 是否访客购买
+          enum:
+          - N
+          - Y
+        orderCountry:
+          type: string
+          description: 下单国家
+          example: CN
+        orderIp:
+          type: string
+          description: 下单的ip
+        orderTime:
+          type: string
+          description: 下单时间 yyyyMMddHHmmss UTC+0
+          example: '20201221120000'
+        payCountry:
+          type: string
+          description: 支付国家
+          example: CN
+        preferentialOrder:
+          type: string
+          description: 是否优惠或者折扣码下单
+          enum:
+          - N
+          - Y
+        registerIp:
+          type: string
+          description: 注册ip
+        registerTerminal:
+          type: string
+          description: 注解平台
+          enum:
+          - android
+          - ios
+          - other
+          - pc
+        registerTime:
+          type: string
+          description: 注解时间 yyyyMMddHHmmss UTC+0
+          example: '20201221120000'
+        workPhone:
+          type: string
+          description: 工作电话
+      description: 购物者风控信息
+    saQueryReq:
+      title: saQueryReq
+      required:
+      - reqId
+      type: object
+      properties:
+        reqId:
+          type: string
+          description: 查询订单号
+        transactionType:
+          type: string
+          enum:
+          - 'sale'
+          - 'auth'
+          - 'capture'
+          - 'viod'
+          - 'refund'
+      description: 店匠查询订单请求参数
+    saSecondResp:
+      title: saSecondResp
+      type: object
+      properties:
+        code:
+          type: string
+          description: 系统的交易结果码
+        msg:
+          type: string
+          description: 系统的交易结果描述
+        remark:
+          type: string
+          description: 请求的remark参数，原文返回
+        reqId:
+          type: string
+          description: 请求订单号
+        status:
+          type: string
+          description: 订单的状态
+          enum:
+          - failed
+          - pending
+          - succeed
+        tradeNo:
+          type: string
+          description: 交易订单号
+      description: 2次交易返回参数
+    saSubmitCheckout:
+      title: saSubmitCheckout
+      discriminator:
+        propertyName: payMethod
+        mapping:
+          Credit Card: '#/components/schemas/creditCardSaS2sCheckout'
+          Qiwi: '#/components/schemas/qiwiSaS2sCheckout'
+      required:
+      - amount
+      - currency
+      - goodsInfo
+      - payMethod
+      - reqId
+      - shopper
+      - storeAuthorization
+      type: object
+      properties:
+        amount:
+          type: number
+          description: 订单金额 请按照4217币种的最小单位传递 eg.(CNY) 110.86  (JPY) 1110
+          format: bigdecimal
+          example: 1
+        currency:
+          type: string
+          description: 订单币种 4217币种的字母码 eg. USD, CNY, EUR
+          example: CNY
+        expiredMinutes:
+          type: integer
+          description: 过期时间(分钟) 当传递这个值后,订单送给渠道后的会按照这个时间过期
+          format: int32
+        goodsInfo:
+          type: array
+          description: 商品信息
+          items:
+            $ref: "#/components/schemas/goods"
+        notifyUrl:
+          type: string
+          example: https://www.baidu.com
+        payMethod:
+          type: string
+          description: 支付方式
+          example: Credit Card
+          enum:
+          - Credit Card
+          - Qiwi
+        redirectUrl:
+          type: string
+          description: 跳转地址 收银台模式和3D模式及跳转必传
+          example: https://www.baidu.com
+        remark:
+          type: string
+          description: 备注信息
+        reqId:
+          type: string
+          description: 请求订单号
+        risk:
+          description: 风控信息
+          $ref: "#/components/schemas/risk"
+        shipping:
+          description: 邮寄地址
+          $ref: "#/components/schemas/address"
+        shopper:
+          description: 用户信息
+          $ref: "#/components/schemas/shopper"
+        storeAuthorization:
+          type: string
+          description: 店铺认证号
+      description: 支付信息
+    saVoidResp:
+      title: saVoidResp
+      type: object
+      properties:
+        code:
+          type: string
+          description: 系统的交易结果码
+        msg:
+          type: string
+          description: 系统的交易结果描述
+        remark:
+          type: string
+          description: 请求的remark参数，原文返回
+        reqId:
+          type: string
+          description: 请求订单号
+        status:
+          type: string
+          description: 订单的状态
+          enum:
+          - failed
+          - succeed
+        tradeNo:
+          type: string
+          description: 交易订单号
+      description: 撤销返回参数
+    secondReq:
+      title: secondReq
+      required:
+      - amount
+      - reqId
+      - tradeNo
+      type: object
+      properties:
+        amount:
+          type: number
+          description: 订单金额 请按照4217币种的最小单位传递 eg.(CNY) 110.86  (JPY) 1110
+          format: bigdecimal
+          example: 1
+        notifyUrl:
+          type: string
+          example: https://www.baidu.com
+        remark:
+          type: string
+          description: 备注信息
+        reqId:
+          type: string
+          description: 请求订单号
+        tradeNo:
+          type: string
+          description: 交易订单号
+      description: 2次交易请求参数
+    shopper:
+      title: shopper
+      required:
+      - id
+      - nickName
+      - platform
+      - shopperIp
+      type: object
+      properties:
+        email:
+          type: string
+          description: 购物者email
+          example: who@mail.com
+        id:
+          type: string
+          description: 购物者id
+          example: '10005'
+        nickName:
+          type: string
+          description: 购物者昵称
+          example: cuber.carrots
+        phone:
+          type: string
+          description: 购物者电话
+          example: '13213213213'
+        phonePrefix:
+          type: string
+          example: '86'
+        platform:
+          type: string
+          description: 购物者所持终端
+          example: android
+          enum:
+          - android
+          - ios
+          - other
+          - pc
+        shopperIp:
+          type: string
+          description: 购物者IP地址
+          example: 127.0.0.1
+      description: 在正向交易中,传递的关于购物者的一些信息
+    voidReq:
+      title: voidReq
+      required:
+      - reqId
+      - tradeNo
+      type: object
+      properties:
+        notifyUrl:
+          type: string
+          example: https://www.baidu.com
+        remark:
+          type: string
+          description: 备注信息
+        reqId:
+          type: string
+          description: 请求订单号
+        tradeNo:
+          type: string
+          description: 交易订单号
+      description: 2次交易请求参数
+    appLoginResp:
+      title: appLoginResp
+      required:
+      - code
+      - msg
+      type: object
+      properties:
+        code:
+          type: string
+          example: 0000
+        msg:
+          type: string
+          description: succeed
+        token:
+          type: string
+          description: 返回的token 访问光子易的接口  X-PD-TOKEN
+        expiresIn:
+          type: integer
+          format: int64
+          description: token 过期时间
+      description: 使用appId和appSecret登陆的返回响应参数   
+    storeBind:
+      title: storeBind
+      required:
+      - storeId
+      - storeName
+      - storeUrl
+      - appId
+      - appSecret
+      type: object
+      properties:
+        storeId:
+          type: string
+          description: 最大64位字符串, 店铺ID
+        storeName:
+          type: string
+          description: 店铺名称
+        storeUrl:
+          type: string
+          description: 店铺的URL地址
+        appId:
+          type: string
+          description: 商户开发者账号
+        appSecret:
+          type: string
+          description: 商户开发者密钥
+      description: 绑定店铺请求参数
+    storeBindResp:
+      title: storeBindResp
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+          example: 0000
+        msg:
+          type: string
+          description: succeed
+        storeAuthorization:
+          type: string
+          description: 店铺唯一识别码
+      description: 绑定店铺响应参数
+    storeUnBindResp:
+      title: storeUnBindResp
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+          example: 0000
+        msg:
+          type: string
+          description: succeed
+        storeId:
+          type: string
+          description: 店匠店铺ID
+      description: 解绑店铺响应参数
+    safirstResp:
+      title: safirstResp
+      type: object
+      properties:
+        code:
+          type: string
+          description: 系统的交易结果码
+        maskCardNo:
+          type: string
+          description: 信用卡支付返回的卡号
+          example: 450000**********1234
+        msg:
+          type: string
+          description: 系统的交易结果描述
+        remark:
+          type: string
+          description: 请求的remark参数，原文返回
+        reqId:
+          type: string
+          description: 请求订单号
+        secured3d:
+          type: string
+          description: 是否3D支付
+          enum:
+          - N
+          - Y
+        status:
+          type: string
+          description: 订单的状态
+          enum:
+          - cancelled
+          - expired
+          - failed
+          - pending
+          - succeed
+          - suspend
+        tradeNo:
+          type: string
+          description: 交易订单号
+      description: 正向订单返回参数
+    browser:
+      title: browser
+      required:
+      - acceptHeader
+      - colorDepth
+      - javaEnabled
+      - language
+      - screenHeight
+      - screenWidth
+      - timeZoneOffset
+      - userAgent
+      type: object
+      properties:
+        acceptHeader:
+          type: string
+          description: http头部信息
+          example: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8
+        colorDepth:
+          type: string
+          description: 色彩深度
+          enum:
+          - '1'
+          - '15'
+          - '16'
+          - '24'
+          - '32'
+          - '4'
+          - '48'
+          - '8'
+        javaEnabled:
+          type: string
+          description: 浏览器是否支持java
+          enum:
+          - 'false'
+          - 'true'
+        language:
+          type: string
+          description: 所属语言
+          example: zh-cn
+        screenHeight:
+          type: string
+          description: 屏幕高度
+          example: '400'
+        screenWidth:
+          type: string
+          description: 屏幕宽度
+          example: '600'
+        timeZoneOffset:
+          type: string
+          description: UTC时间与浏览器本地的时间之间的时差，以分钟为单位。示例：“ - 160”
+          example: "-160"
+        userAgent:
+          type: string
+          description: 浏览器引擎
+          example: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
+            like Gecko) Chrome/87.0.4280.141 Safari/537.36
+      description: 浏览器信息, PC 3D 必填
+    received:
+      title: received
+      required:
+      - rogar
+      type: object
+      properties:
+        rogar:
+          type: boolean
+          example: true
+      description: 成功收到相应
+x-webhooks:
+  sale/auth:
+    post:
+      summary: 正向交易结果通知
+      description: 正向交易结果通知
+      operationId: newPet
+      tags: 
+        - webhook_notify
+      parameters:
+      - name: X-PD-NOTIFICATION-CATAGORY
+        in: header
+        description: 通知种类
+        required: true
+        example: payment
+      - name: X-PD-NOTIFICATION-TYPE
+        in: header
+        description: 通知子类
+        required: true
+        example: sale
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/safirstResp"
+      responses:
+        '200#sale/auth':
+          description: OK
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/received'
+  refund/capture/void:
+    post:
+      summary: 第二次交易结果通知
+      description: 第二次交易结果通知
+      operationId: newPet
+      tags: 
+        - webhook_notify
+      parameters:
+      - name: X-PD-NOTIFICATION-CATAGORY
+        in: header
+        description: 通知种类
+        required: true
+        example: payment
+      - name: X-PD-NOTIFICATION-TYPE
+        in: header
+        description: 通知子类
+        required: true
+        example: capture
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/saSecondResp"
+      responses:
+        '200#sale/auth':
+          description: OK
+          content:
+            application/json:
+              schema:
+                '$ref': '#/components/schemas/received'  
